@@ -13,24 +13,28 @@ module "elb_sg" {
   sg_name = "elb_sg"
 }
 
+module "mysql_db" {
+  source = "/home/centos/terraform/lamp/modules/datebases"
+}
+
 #locals {
 #ec2_sg_id = concat(aws_security_groups.ec2_sg.id, aws_security_groups.elb_sg.id)
 #}
 
-resource "aws_db_instance" "mysql_db" { 
-  allocated_storage = 20
-  storage_type = "gp2"
-  engine = "mysql"
-  engine_version = "5.7"
-  instance_class = "db.t2.micro"
-  name = "testdb"
-  username = "dbuser"
-  password = "12FLoz355"
-  parameter_group_name = "default.mysql5.7"
-  identifier = "wordpress-db-qa"
-  final_snapshot_identifier = "final-snapshot"
-  skip_final_snapshot = true
-}
+#resource "aws_db_instance" "mysql_db" { 
+#  allocated_storage = 20
+#  storage_type = "gp2"
+#  engine = "mysql"
+#  engine_version = "5.7"
+#  instance_class = "db.t2.micro"
+#  name = "testdb"
+#  username = "dbuser"
+#  password = "12FLoz355"
+#  parameter_group_name = "default.mysql5.7"
+#  identifier = "wordpress-db-qa"
+#  final_snapshot_identifier = "final-snapshot"
+#  skip_final_snapshot = true
+#}
 
 resource "aws_instance" "qa_app" {
   ami           = "${var.ami}"
@@ -48,7 +52,7 @@ resource "aws_instance" "qa_app" {
     connection = {
       type = "ssh"
       user = "centos"
-#      private_key = "${file("keys/opsbox19.pem")}"
+      private_key = "${file("${var.private_key_path}")}"
   }
  }
   provisioner "file" {
@@ -58,7 +62,7 @@ resource "aws_instance" "qa_app" {
     connection = {
      type = "ssh"
      user = "centos"
-#     private_key = "${file("keys/opsbox19.pem")}"
+     private_key = "${file("${var.private_key_path}")}"
   }
  }
 }
